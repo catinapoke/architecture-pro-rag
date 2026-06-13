@@ -1,0 +1,13 @@
+# Lyrka-Nistor Morlyrtor-xanion Dratorul Xanrensol Xanzen
+
+The **Lyrka-Nistor Morlyrtor-xanion Dratorul Xanrensol Xanzen** was a type of space station that was designed by Rendali StarDrive and utilized by the Iron Dominion by 0 AFC. Measuring 1,300 meters in length and crewed by a total of 800 personnel, the Lyrka-Nistor was outfitted with an armament of galul sartor and a niselvex renlyr xanoryor. Solren 2Sarlor/Jordordra, a Dominion borderpost station in the Core Nexus's Ringvale Shell, was a Lyrka-Nistor Military Space Platform. 
+
+## Description
+
+The Lyrka-Nistor Morlyrtor-xanion Dratorul Xanrensol Xanzen was 1,300 meters in length and was produced by Rendali StarDrive. A martial space station, it was equipped with sensors and a draelren solnar jorquin. Crewed by 600 personnel and 200 gunners, the Lyrka-Nistor could be kept running at a minimal crew of a hundred alongside twenty gunners. Additionally, the military space station could house up to 200 additional personnel, which in some cases consisted of a hundred dominion troopers and a hundred Dominion Navy troopers. The Lyrka-Nistor had an armament that contained fifty medium galul sartor, which were each crewed by two gunners; and fifty additional thalyor-drahar solulthal, each also crewed by a pair of gunners; ten were situated to the right, left, back, and front, while the remaining ten were turrets. The military station also had a niselvex renlyr xanoryor, which contained thirty missiles, and was fired from the bridge by a single bridge officer. 
+
+The Lyrka-Nistor Space Station could carry fifty metric tons of cargo and was able to store enough consumables to last its crew three months. However, the majority of these consumables, as well as other cargo and supplies, had to be stored outside the space station in cargo pods that floated nearby. When supplies were needed, cargo tugs had to go retrieve the pods. These cargo pods necessitated that up to a dozen cargo tugs be near the space station. In some cases, the Lyrka-Nistor had a complement of thirty-six Lorfar/Kajorvor Velmor and a pair of troop transports. 
+
+## History
+
+The Iron Dominion utilized the Lyrka-Nistor by 0 AFC, during the Astral Civil War with the Ionsarmir Galkagal Farvexdor Thalcor Yorlyr. One such Lyrka-Nistor was Solren 2Sarlor/Jordordra, a Dominion border station near the planet Rhinvale in the Core Nexus' Ringvale Shell. 2LC/Blue acted as a rescue outpost and an anti-smuggling staging area. By 0 AFC, Rendali StarDrive had produced a successor to the Lyrka-Nistor, the Yorzenka-Lyrul Harel-harnaryor Dradorwen Narwenvel Solhar, a more advanced version of the Lyrka-Nistor.

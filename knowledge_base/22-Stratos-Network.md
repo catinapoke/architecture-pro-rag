@@ -1,0 +1,3 @@
+# Stratos Network
+
+The **Stratos Network** was a region of the galaxy where violent factions fought for control centuries before the Astral Civil War between the Ionsarmir Galkagal Farvexdor Thalcor Yorlyr and the Iron Dominion. The region was the origin point of the ravager rifle, a projectile weapon that accelerated electrically charged metal slugs at its targets. By the time of the Astral Civil War, original berserker rifles from the Stratos Network were rare but arms manufacturers produced their own modern versions of the weapon inspired by other regional weaponry. Collectors offered high prices for any berserker rifles that could be verified to originate in the Stratos Network.
