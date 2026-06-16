@@ -1,98 +1,173 @@
-import faiss, numpy as np, json
+from __future__ import annotations
+
+from dataclasses import dataclass
+import json
+import os
+from pathlib import Path
+from typing import Any, Protocol, TypedDict, cast
+
 from langchain_huggingface import HuggingFaceEmbeddings
-from build_index import split_text
+import numpy as np
 
-index: faiss.IndexFlatL2 | None = None
-embeddings: HuggingFaceEmbeddings | None = None
+from build_index import EMBEDDING_MODEL_NAME, get_faiss, split_text
 
-index = faiss.read_index("index.faiss")
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2", encode_kwargs={"normalize_embeddings": True})
+class ChunkEntry(TypedDict):
+    id: int
+    sha: str
+    index: int
 
+
+class FileEntry(TypedDict):
+    sha256: str
+    chunks: list[ChunkEntry]
+
+
+class ChunksData(TypedDict):
+    schema_version: int
+    index_type: str
+    embedding_model: str
+    files: dict[str, FileEntry]
+
+
+class ChunkLookupEntry(TypedDict):
+    file: str
+    index: int
+    sha: str
+
+
+class EmbeddingsClient(Protocol):
+    def embed_query(self, text: str) -> list[float]:
+        ...
+
+
+index: Any | None = None
+embeddings: EmbeddingsClient | None = None
+
+INDEX_PATH = Path("index.faiss")
+CHUNKS_DATA_PATH = Path("chunks_data.json")
+KNOWLEDGE_BASE_DIR = Path("knowledge_base")
+
+
+@dataclass
 class Chunk:
-    def __init__(self, file: str, index: int, text: str, distance: float):
-        self.file = file
-        self.index = index
-        self.text = text
-        self.distance = distance
+    file: str
+    index: int
+    text: str
+    distance: float
 
-    def __str__(self):
-        return f"Chunk(file={self.file}, index={self.index}, text={self.text}, distance={self.distance})"
 
+@dataclass
 class TextPart:
-    def __init__(self, text: str, distance: float):
-        self.text = text
-        self.distance = distance
+    text: str
+    distance: float
 
-    def __str__(self):
-        return f"TextPart(text={self.text}, distance={self.distance})"
-
-def get_file_by_chunk_index(chunks_data: list[dict], chunk_index: int) -> dict:
-    for chunk in chunks_data:
-        if chunk['start_index'] <= chunk_index <= chunk['end_index']:
-            return chunk
-    return None
-
-def get_chunk_text(file_entry: dict, chunk_index: int, file_text: str) -> str:
-    local_index = chunk_index - file_entry['start_index']
-    return split_text(file_text)[local_index]
-
-def get_text_part_text(file_entry: dict, text_part_index: int, file_text: str) -> str:
-    local_index = text_part_index - file_entry['start_index']
-    parts = split_text(file_text)
-    return ''.join(parts[local_index-1:local_index+1])
-
-def load_file_text(file_path: str) -> str:
-    with open(file_path, 'r') as file:
-        return file.read()
-
-def find_related_chunks(query: str) -> list[Chunk]:
+def load_runtime() -> None:
     global index, embeddings
+    if index is not None and embeddings is not None:
+        return
+
+    embeddings = HuggingFaceEmbeddings(
+        model_name=EMBEDDING_MODEL_NAME,
+        encode_kwargs={"normalize_embeddings": True},
+    )
+    embeddings.embed_query("warmup")
+    index = get_faiss().read_index(str(INDEX_PATH))
+
+
+def load_file_text(file_path: Path) -> str:
+    return file_path.read_text(encoding="utf-8")
+
+
+def load_chunks_data(path: Path = CHUNKS_DATA_PATH) -> ChunksData:
+    with path.open("r", encoding="utf-8") as file:
+        return cast(ChunksData, json.load(file))
+
+
+def build_chunk_lookup(chunks_data: ChunksData) -> dict[int, ChunkLookupEntry]:
+    lookup: dict[int, ChunkLookupEntry] = {}
+    for file_name, file_entry in chunks_data.get("files", {}).items():
+        for chunk in file_entry.get("chunks", []):
+            chunk_id = int(chunk["id"])
+            lookup[chunk_id] = {
+                "file": file_name,
+                "index": int(chunk["index"]),
+                "sha": chunk.get("sha"),
+            }
+    return lookup
+
+
+def _find_related(query: str, top_k: int) -> tuple[list[float], list[int]]:
+    load_runtime()
+    if index is None or embeddings is None:
+        raise RuntimeError("Query runtime is not initialized.")
     query_vector = embeddings.embed_query(query)
+    distances, ids = index.search(np.array([query_vector], dtype=np.float32), top_k)
+    return distances[0].tolist(), [int(item) for item in ids[0].tolist()]
 
-    # Search the index for the query vector
-    distances, indices = index.search(np.array([query_vector], dtype=np.float32), 10)
 
-    chunks = []
+def find_related_chunks(query: str, top_k: int = 10) -> list[Chunk]:
+    distances, chunk_ids = _find_related(query, top_k)
+    chunks_data = load_chunks_data()
+    chunk_lookup = build_chunk_lookup(chunks_data)
+    file_text_cache: dict[str, str] = {}
+    result: list[Chunk] = []
 
-    # Load the chunks_data from file
-    with open('chunks_data.json', 'r', encoding='utf-8') as file:
-        chunks_data = json.load(file)
+    for idx, chunk_id in enumerate(chunk_ids):
+        if chunk_id < 0:
+            continue
+        chunk_meta = chunk_lookup.get(chunk_id)
+        if chunk_meta is None:
+            continue
 
-        for index, item_index in enumerate(indices[0]):
-            file = get_file_by_chunk_index(chunks_data, item_index)
+        file_name = chunk_meta["file"]
+        if file_name not in file_text_cache:
+            file_text_cache[file_name] = load_file_text(KNOWLEDGE_BASE_DIR / file_name)
 
-            # define chunk text
-            file_text = load_file_text('knowledge_base/' + file['file'])
-            chunk_text = get_chunk_text(file, item_index, file_text)
+        parts = split_text(file_text_cache[file_name])
+        local_index = chunk_meta["index"]
+        if local_index < 0 or local_index >= len(parts):
+            continue
+        result.append(
+            Chunk(
+                file=file_name,
+                index=local_index,
+                text=parts[local_index],
+                distance=float(distances[idx]),
+            )
+        )
 
-            chunks.append(Chunk(file=file['file'], index=item_index, text=chunk_text, distance=distances[0][index]))
-    
-    return chunks
+    return result
 
-def find_related_text_parts(query: str) -> list[TextPart]:
-    global index, embeddings
-    query_vector = embeddings.embed_query(query)
 
-    # Search the index for the query vector
-    distances, indices = index.search(np.array([query_vector], dtype=np.float32), 10)
+def find_related_text_parts(query: str, top_k: int = 10) -> list[TextPart]:
+    distances, chunk_ids = _find_related(query, top_k)
+    chunks_data = load_chunks_data()
+    chunk_lookup = build_chunk_lookup(chunks_data)
+    file_text_cache: dict[str, str] = {}
+    result: list[TextPart] = []
 
-    text_parts = []
+    for idx, chunk_id in enumerate(chunk_ids):
+        if chunk_id < 0:
+            continue
+        chunk_meta = chunk_lookup.get(chunk_id)
+        if chunk_meta is None:
+            continue
 
-     # Load the chunks_data from file
-    with open('chunks_data.json', 'r', encoding='utf-8') as file:
-        chunks_data = json.load(file)
+        file_name = chunk_meta["file"]
+        if file_name not in file_text_cache:
+            file_text_cache[file_name] = load_file_text(KNOWLEDGE_BASE_DIR / file_name)
 
-        for i, item_index in enumerate(indices[0]):
-            file = get_file_by_chunk_index(chunks_data, item_index)
+        parts = split_text(file_text_cache[file_name])
+        local_index = chunk_meta["index"]
+        if local_index < 0 or local_index >= len(parts):
+            continue
 
-            # define chunk text
-            file_text = load_file_text('knowledge_base/' + file['file'])
-            part_text = get_text_part_text(file, item_index, file_text)
+        start = max(0, local_index - 1)
+        end = min(len(parts), local_index + 2)
+        result.append(TextPart(text="".join(parts[start:end]), distance=float(distances[idx])))
 
-            text_parts.append(TextPart(text=part_text, distance=distances[0][i]))
-    
+    return result
 
-    return text_parts
 
 if __name__ == "__main__":
     chunks = find_related_chunks("When did Lyrgal travel to the Fringe Expanse?")
