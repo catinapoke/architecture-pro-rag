@@ -561,13 +561,49 @@ Answer: Я не знаю. (В документации нет упоминани
 
 ## Результат
 
-В скрипте выделить обработку файла - чтение, сегментация, проверка сегментов и генерация векторов. Дополнительно выделить функцию записи выбранных файлов в индекс(он принимает на вход параметр, который может быть свежесозданным пустым индексом или заранее загруженным).
+В скрипте выделена обработка файла - чтение, сегментация, проверка сегментов и генерация векторов. Дополнительно выделена функцию записи выбранных файлов в индекс.
 
-Добавить скрипт `update_index.py`, который пройдется по файлу `chunks_data.json` и сравнит sha256 для всех файлов из 'knowledge_base' и если отличается или отсутствует, то добавить в список на обновление. Не забыть про обработку ошибок.
+Добавлен скрипт `update_index.py`, который пройдется по файлу `chunks_data.json` и сравнит sha256 для всех файлов из 'knowledge_base' и если отличается или отсутствует, то добавит в список на обновление. В конце работы перезаписывает индекс через подмену файлов.
 
-В конце работы перезаписывает индекс.
+Скрипт с cron вызовом скрипта обновления: 
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+chmod +x scripts/update_index_cron.sh
+crontab -e
 
-Дополнительно скрипт с cron вызовом скрипта обновления.
+0 6 * * * cd ~/Projects/architecture-pro-rag && ./scripts/update_index_cron.sh
 
-Написать диаграмму процесса.
+Пример лога обновления с добавлением одного небезопасного и одного безопасного файла (чанки небезопасного файла фильтруются).
 
+```
+2026-06-18 18:59:59 | INFO | cron update started
+2026-06-18 19:00:01,691 | INFO | Update started
+2026-06-18 19:00:01,691 | INFO | Update started
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:   1%|          | 1/199 [00:00<00:00, 4021.38it/s, Materializing param=embeddings.LayerNorm.bias]
+Loading weights:   1%|          | 1/199 [00:00<00:00, 3104.59it/s, Materializing param=embeddings.LayerNorm.bias]
+Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7639.76it/s, Materializing param=pooler.dense.weight]
+[1mMPNetModel LOAD REPORT[0m from: sentence-transformers/all-mpnet-base-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+You are using a model of type extractor to instantiate a model of type . This is not supported for all configurations of models and can yield errors.
+2026-06-18 19:00:16,165 | INFO | Mode=incremental, new=['40-Crystal-Treat copy.md', '41-Something copy.md'], changed=[], removed=[]
+2026-06-18 19:00:17,132 | INFO | Update finished. removed_chunk_ids=0, added_chunk_ids=16, total_vectors=629
+============================================================
+🧠 Model Configuration
+============================================================
+Encoder model      : microsoft/deberta-v3-base
+Counting layer     : count_lstm_v2
+Token pooling      : first
+============================================================
+loaded models!
+2026-06-18 19:00:17 | INFO | cron update finished
+```
+
+Диаграмма процесса `process.plantuml`:
+![](update_index_process.png)

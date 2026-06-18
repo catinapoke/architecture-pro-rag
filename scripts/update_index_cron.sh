@@ -21,7 +21,7 @@ trap cleanup EXIT
 
 cd "${PROJECT_ROOT}"
 echo "$(date '+%Y-%m-%d %H:%M:%S') | INFO | cron update started" >> "${LOG_FILE}"
-python3 update_index.py >> "${LOG_FILE}" 2>&1
+"${PROJECT_ROOT}/.venv/bin/python" update_index.py >> "${LOG_FILE}" 2>&1
 echo "$(date '+%Y-%m-%d %H:%M:%S') | INFO | cron update finished" >> "${LOG_FILE}"
 
 # Example crontab entry (daily at 06:00):
