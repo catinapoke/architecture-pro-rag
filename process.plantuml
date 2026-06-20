@@ -1,0 +1,35 @@
+@startuml update_index_process
+title Автоматическое обновление RAG-индекса
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "cron\n0 6 * * *" as Cron
+
+folder "knowledge_base/" as Source {
+  artifact "Markdown-файлы" as Docs
+}
+
+component "scripts/update_index_cron.sh" as Shell
+component "update_index.py" as Script
+database "chunks_data.json" as Chunks
+component "Модель эмбеддингов" as Embeddings
+database "index.faiss" as Index
+file "logs/update_index.log" as Logs
+
+Cron --> Shell : ежедневный запуск
+Shell --> Script : активирует .venv\nи запускает Python-скрипт
+Script --> Docs : читает новые/измененные файлы
+Script --> Chunks : обновляет чанки\nи sha256 файлов
+Script --> Embeddings : генерирует векторы\nдля новых чанков
+Embeddings --> Index : записывает эмбеддинги\nв FAISS-индекс
+Shell --> Logs : пишет старт/финиш cron
+Script --> Logs : пишет режим, ошибки\nи итоговые счетчики
+
+note right of Logs
+  Хранит время запуска и завершения,
+  количество добавленных чанков,
+  размер индекса и ошибки.
+end note
+
+@enduml

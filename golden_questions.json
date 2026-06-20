@@ -1,0 +1,109 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Что такое veil ceremony и зачем Baran Du создали этот ритуал?",
+      "expected": "Это ритуал, в котором Sage притворялся умершим, чтобы тайно вступить в Veiled Keepers. Его создали, чтобы участники считали себя \"мёртвыми\" для внешней галактики и не раскрывали существование секты."
+    },
+    {
+      "id": 2,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Как Elvorvex использовали узелковые строки и какую роль такая строка сыграла в истории Jace Solen?",
+      "expected": "Elvorvex записывали генеалогию и сообщения через узлы на нитях. Одна такая строка содержала пророчество \"He will ruin those who deny justice\" и помогла привести Jace Solen к Vexara."
+    },
+    {
+      "id": 3,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Чем Morpivan's Language отличался по форме записи?",
+      "expected": "Он записывался строками с множеством повторяющихся согласных и гласных, разделённых дефисами, например Elhh-pochrr-fffff-snappp."
+    },
+    {
+      "id": 4,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Почему сериал Rangers Of The New Concord был отменён?",
+      "expected": "Сериал был отменён после того, как Helion Studios отказалась от участия Harkacor Farlyrfar; Kathryn Kennedy позже сказала, что сценарии так и не были написаны, а идеи перенесут в будущие эпизоды The Veil Ranger."
+    },
+    {
+      "id": 5,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Кто должен был появиться в книге BX-7 And The Snow Monster и почему книга не вышла?",
+      "expected": "В книге должны были появиться BX-7, C-3KX и R2-KX на Frosthold. Её отменили после нескольких переносов даты выхода."
+    },
+    {
+      "id": 6,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Чем Korrath Alloy Heavy Suit отличался от обычной брони?",
+      "expected": "Это была лёгкая броня из прочного Korrath Alloy, защищавшая даже от режущего оружия. В 3956 BFC она стоила 900-1350 trade chits, а к 3951 BFC уже 1700-2040."
+    },
+    {
+      "id": 7,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Какую роль Tordrasar 17 сыграл во время First Battle Of Kryon?",
+      "expected": "Он вместе с Mirsol-Mirwen, Draxon и другими репликами защищал баррикаду от B1-Series War Automatons, после чего выжившие продвинулись к орудийной позиции."
+    },
+    {
+      "id": 8,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Как работает техника Heatbind и когда Jace Solen её использовал?",
+      "expected": "Heatbind позволяет через Synth Flux сохранять тепло тела в холодной среде. Jace Solen использовал её в 28 AFC во время Battle Of Ebar, когда шахта потеряла атмосферу."
+    },
+    {
+      "id": 9,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Что сделал VX-4600 на борту Obsidian Talon и как он был уничтожен?",
+      "expected": "VX-4600 помог T3-MX починить повреждённый корабль Obsidian Talon, но затем был расстрелян и уничтожен HX-50 Series Assassin Automaton."
+    },
+    {
+      "id": 10,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Что утверждал Chain Realms Theorem?",
+      "expected": "Он предполагал существование Realm Between Realms, мистического пространства между временем и пространством, связывающего живых и мёртвых."
+    },
+    {
+      "id": 11,
+      "section": "known",
+      "expect_answer": true,
+      "question": "Что построили Veilmask Holdings и Velara в рамках совместного предприятия?",
+      "expected": "Они построили plasma refinery complex на Cliffs of Theeden, который давал городу избыток энергии и мог экспортировать plasma."
+    },
+    {
+      "id": 12,
+      "section": "missing",
+      "expect_answer": false,
+      "question": "Когда проходил Club Penguin Astral Rift Takeover и где его продвигали офлайн?",
+      "expected": "В базе знаний нет информации для ответа."
+    },
+    {
+      "id": 13,
+      "section": "missing",
+      "expect_answer": false,
+      "question": "Какая эксклюзивная механика была доступна подписчикам во время обоих Astral Rift-событий в Club Penguin?",
+      "expected": "В базе знаний нет информации для ответа."
+    },
+    {
+      "id": 14,
+      "section": "missing",
+      "expect_answer": false,
+      "question": "Что Grovo сделал со снегом в Crystal Treat?",
+      "expected": "В базе знаний нет информации для ответа."
+    },
+    {
+      "id": 15,
+      "section": "missing",
+      "expect_answer": false,
+      "question": "Какие показатели просмотров и лайков получил Crystal Treat?",
+      "expected": "В базе знаний нет информации для ответа."
+    }
+  ]
+}
