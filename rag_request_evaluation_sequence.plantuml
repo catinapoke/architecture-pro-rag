@@ -1,0 +1,53 @@
+@startuml rag_request_evaluation_sequence
+title Запрос к RAG-боту и оценка ответа
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Пользователь" as User
+participant "RAG-бот" as Bot
+database "index.faiss" as Index
+database "knowledge_base/" as KB
+participant "LLM" as LLM
+participant "test_rag_bot.py" as Eval
+database "golden_questions.json" as Golden
+database "logs/rag_eval.jsonl" as Logs
+
+== Обработка запроса ==
+
+User -> Bot : задает вопрос
+Bot -> Index : ищет похожие чанки
+
+alt Индекс пустой
+  Bot -> Logs : status = no_chunks
+  Bot --> User : Отказ от ответа
+else Чанки найдены
+  Bot -> KB : читает тексты чанков
+
+  alt Чанк невалидный
+    Bot -> Logs : status = invalid_chunk
+    Bot --> User : Отказ от ответа
+  else Чанк валидный
+    Bot -> LLM : вопрос + найденный контекст
+
+    alt Ошибка генерации
+      Bot -> Logs : status = generation_error
+      Bot --> User : fallback-ответ
+    else Ответ получен
+      LLM --> Bot : ответ
+      Bot -> Logs : status = success,\nисточники, длина ответа
+      Bot --> User : ответ
+    end
+  end
+end
+
+== Оценка качества ==
+
+Eval -> Golden : читает вопросы\nи ожидаемые ответы
+Golden --> Eval : golden set
+Eval -> Bot : задает вопросы из golden set
+Bot --> Eval : ответы + источники
+Eval -> Eval : сравнивает с ожидаемыми ответами
+Eval -> Logs : пишет результат оценки
+
+@enduml

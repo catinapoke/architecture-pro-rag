@@ -90,8 +90,7 @@ def load_or_create_index(path: Path = INDEX_PATH) -> Any:
     if not path.exists():
         return create_empty_index()
 
-    faiss = get_faiss()
-    loaded_index = faiss.read_index(str(path))
+    loaded_index = get_faiss().read_index(str(path))
     if not hasattr(loaded_index, "add_with_ids"):
         raise ValueError("index.faiss is not compatible with id-based updates.")
     return loaded_index
@@ -156,11 +155,10 @@ def _add_processed_file(target_index: Any, file_path: Path) -> FileEntry:
 
 
 def save_atomically(target_index: Any, chunks_data: ChunksData) -> None:
-    faiss = get_faiss()
     index_tmp = INDEX_PATH.with_name(f"{INDEX_PATH.name}.tmp")
     chunks_tmp = CHUNKS_DATA_PATH.with_name(f"{CHUNKS_DATA_PATH.name}.tmp")
 
-    faiss.write_index(target_index, str(index_tmp))
+    get_faiss().write_index(target_index, str(index_tmp))
     with chunks_tmp.open("w", encoding="utf-8") as file:
         json.dump(chunks_data, file)
 

@@ -9,7 +9,6 @@ import time
 from typing import Any
 
 from gliner2 import GLiNER2
-import faiss
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter

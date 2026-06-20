@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+import tempfile
 import unittest
 
 try:
@@ -38,6 +40,13 @@ class QueryIndexHelpersTests(unittest.TestCase):
 
         self.assertEqual({"file": "a.md", "index": 0, "sha": "a1"}, lookup[101])
         self.assertEqual({"file": "b.md", "index": 3, "sha": "b1"}, lookup[202])
+
+    def test_load_file_text_returns_empty_string_for_missing_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            missing_file = Path(temp_dir) / "missing.md"
+
+            self.assertFalse(missing_file.exists())
+            self.assertEqual("", query_index.load_file_text(missing_file))
 
 
 if __name__ == "__main__":

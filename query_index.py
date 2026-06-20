@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
+import sys
 from typing import Any, Protocol, TypedDict, cast
 
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -71,11 +72,17 @@ def load_runtime() -> None:
         encode_kwargs={"normalize_embeddings": True},
     )
     embeddings.embed_query("warmup")
-    index = get_faiss().read_index(str(INDEX_PATH))
+    faiss = get_faiss()
+    # Work around FAISS/OpenMP crashes seen on recent macOS builds.
+    faiss.omp_set_num_threads(1)
+    index = faiss.read_index(str(INDEX_PATH))
 
 
 def load_file_text(file_path: Path) -> str:
-    return file_path.read_text(encoding="utf-8")
+    try:
+        return file_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return ""
 
 
 def load_chunks_data(path: Path = CHUNKS_DATA_PATH) -> ChunksData:
